@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Clone</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen" class="screen">
+        <div class="login-box">
+            <h2>WhatsApp Web</h2>
+            <input type="email" id="email-input" placeholder="Email">
+            <input type="password" id="password-input" placeholder="Password">
+            <button id="login-btn">Login</button>
+            <button id="signup-btn" class="secondary">Create Account</button>
+        </div>
+    </div>
+
+    <!-- INBOX SCREEN -->
+    <div id="inbox-screen" class="screen" style="display: none;">
+        <header class="app-header">
+            <div class="profile-info">
+                <div class="avatar"></div>
+                <span id="my-email">My Email</span>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <!-- New Settings/Menu Icon -->
+                <button id="logout-btn" class="icon-btn"
+                    style="background:none; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center;"
+                    title="Logout">
+                    <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M15 16L20 12M20 12L15 8M20 12H9M14 21H5C3.89543 21 3 20.1046 3 19V5C3 3.89543 3.89543 3 5 3H14"
+                            stroke="var(--sub-text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- NEW: Search Bar -->
+        <div class="search-container" style="padding: 10px 15px; background: var(--bg-color);">
+            <div
+                style="display: flex; align-items: center; background: var(--input-bg); border-radius: 8px; padding: 5px 15px; border: 1px solid var(--border-color);">
+                <span style="color: var(--sub-text); margin-right: 10px;">🔍</span>
+                <input type="text" id="search-users" placeholder="Search or start new chat"
+                    style="flex: 1; border: none; background: transparent; outline: none; padding: 5px 0; color: var(--text-color);">
+            </div>
+        </div>
+
+        <div class="tabs-container">
+            <div class="tab active" id="tab-users">Chats</div>
+            <div class="tab" id="tab-requests">
+                Requests
+                <span id="req-badge" class="badge" style="display:none;">0</span>
+            </div>
+            <div class="tab" id="tab-links">Feed</div>
+        </div>
+
+        <div id="chat-list" class="scrollable"></div>
+        <div id="requests-list" class="scrollable" style="display:none;"></div>
+
+        <div id="links-list" class="scrollable" style="display:none; padding: 15px;">
+            <div class="add-link-box" style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <input type="text" id="image-url-input" placeholder="Paste Video/Image URL here..."
+                    style="flex: 1; padding: 10px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-color); border-radius: 8px; outline: none; font-size: 14px;">
+                <button id="add-link-btn"
+                    style="padding: 10px 15px; background-color: #00a884; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">Add</button>
+            </div>
+            <div id="image-gallery" style="display: flex; flex-direction: column; gap: 15px;"></div>
+        </div>
+    </div>
+
+    <!-- CHAT SCREEN -->
+    <div id="chat-screen" class="screen" style="display:none;">
+        <header class="app-header chat-header"
+            style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <button id="back-btn" class="icon-btn"
+                    style="margin-right: 5px; background:none; border:none; color:white; font-size:20px; cursor:pointer;">⬅</button>
+                <div class="profile-info-right" style="display: flex; align-items: center; gap: 10px;">
+                    <div class="avatar"></div>
+                    <div style="display: flex; flex-direction: column;">
+                        <span id="chatting-with-name" style="font-weight: bold; font-size: 16px;">User</span>
+                        <!-- NEW: Online/Typing Status -->
+                        <span id="chat-user-status" style="font-size: 12px; color: #d1d7db;">Online</span>
+                    </div>
+                </div>
+            </div>
+            <div class="call-actions" style="display: flex; gap: 20px; align-items: center;">
+                <button id="video-call-btn"
+                    style="background: none; border: none; font-size: 20px; cursor: pointer; color: white; transition: 0.3s;"
+                    title="Video Call">📹</button>
+                <button id="audio-call-btn"
+                    style="background: none; border: none; font-size: 20px; cursor: pointer; color: white; transition: 0.3s;"
+                    title="Audio Call">📞</button>
+                
+                <!-- NEW: 3 Dots Menu Container -->
+                <div style="position: relative;">
+                    <button id="chat-menu-btn" style="background: none; border: none; font-size: 20px; cursor: pointer; color: white; padding: 0 5px;">⋮</button>
+                    <!-- Dropdown Box -->
+                    <div id="chat-menu-dropdown" style="display: none; position: absolute; right: 0; top: 120%; background: var(--card-bg); box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-radius: 8px; z-index: 100; min-width: 120px; border: 1px solid var(--border-color);">
+                        <div id="block-user-btn" style="padding: 12px 20px; color: #f44336; cursor: pointer; font-size: 14px; font-weight: bold;">Block</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div id="chat-box" class="scrollable chat-bg"
+            style="padding: 20px; display: flex; flex-direction: column; gap: 10px;"></div>
+
+        <!-- BLOCKED NOTIFICATION (Hidden by default) -->
+        <div id="blocked-footer-msg" style="display: none; width: 100%; text-align: center; padding: 15px; background: var(--card-bg); color: var(--sub-text); font-size: 14px; border-top: 1px solid var(--border-color); cursor: pointer;">
+            You blocked this contact. Tap to unblock.
+        </div>
+
+        <!-- UPGRADED CHAT FOOTER -->
+        <footer id="active-chat-footer" class="chat-footer"
+            style="display: flex; align-items: center; gap: 10px; padding: 10px 15px; background: var(--card-bg); border-top: 1px solid var(--border-color);">
+            <button id="emoji-btn"
+                style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--sub-text);">😀</button>
+            <label for="file-input" class="attachment-btn"
+                style="font-size: 24px; cursor: pointer; color: var(--sub-text);">📎</label>
+            <input type="file" id="file-input" accept="image/*,video/*" style="display:none;">
+
+            <input type="text" id="message-input" placeholder="Type a message"
+                style="flex: 1; padding: 12px 15px; border-radius: 24px; border: none; background: var(--bg-color); color: var(--text-color); outline: none; font-size: 15px;">
+
+            <!-- Send / Mic Toggle Buttons -->
+            <button id="mic-btn"
+                style="background: #00a884; color: white; border: none; border-radius: 50%; width: 45px; height: 45px; cursor: pointer; font-size: 20px; display: flex; justify-content: center; align-items: center;">🎤</button>
+            <button id="send-btn"
+                style="background: #00a884; color: white; border: none; border-radius: 50%; width: 45px; height: 45px; cursor: pointer; font-size: 20px; display: none; justify-content: center; align-items: center;">➤</button>
+        </footer>
+    </div>
+
+    <!-- MODALS & OVERLAYS -->
+    <div id="custom-confirm" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <p style="margin-bottom: 15px; color: var(--text-color); font-weight: bold;">Delete message for everyone?
+            </p>
+            <div class="modal-actions">
+                <button id="confirm-cancel" class="btn-cancel"
+                    style="background: transparent; color: #00a884; border: 1px solid #00a884;">Cancel</button>
+                <button id="confirm-ok" class="btn-delete"
+                    style="background: #f44336; color: white; border: none;">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast"></div>
+    <script type="module" src="app.js"></script>
+
+    <div id="call-screen"
+        style="display:none; width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; z-index: 99999; background: #111b21;">
+    </div>
+    <script src="https://unpkg.com/@zegocloud/zego-uikit-prebuilt/zego-uikit-prebuilt.js"></script>
+</body>
+
+</html>
