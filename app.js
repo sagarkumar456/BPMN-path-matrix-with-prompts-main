@@ -170,6 +170,10 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 function showScreen(screenName) {
+    // LOADER FIX: Hide the initial web loader once Firebase auth check is complete
+    const loader = document.getElementById('initial-loader');
+    if (loader) loader.style.display = 'none';
+
     screens.login.style.display = screenName === 'login' ? 'flex' : 'none';
     screens.inbox.style.display = screenName === 'inbox' ? 'flex' : 'none';
     screens.chat.style.display = screenName === 'chat' ? 'flex' : 'none';
@@ -382,11 +386,7 @@ function updateBlockUI() {
     }
 }
 
-// ==========================================
-// --- FIX: NATIVE BACK BUTTON LOGIC ---
-// ==========================================
 document.getElementById('back-btn').onclick = () => {
-    // Instead of forcing the screen manually, this will simulate a natural phone back button press
     history.back();
 };
 
@@ -402,7 +402,6 @@ function openChatRoom(user) {
     activeChatUser = user;
     document.getElementById('chatting-with-name').innerText = user.email.split('@')[0];
     
-    // Inject the current state into phone history to fix the blank screen bug
     history.pushState({ page: 'chat' }, 'Chat', '#chat');
 
     showScreen('chat');

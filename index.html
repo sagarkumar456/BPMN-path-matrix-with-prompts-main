@@ -10,7 +10,15 @@
 
 <body>
 
-    <!-- LOGIN SCREEN -->
+    <!-- NEW INITIAL WEB LOADER (Fixes the Blank Screen Flash) -->
+    <div id="initial-loader" style="display: flex; justify-content: center; align-items: center; height: 100vh; width: 100vw; position: absolute; z-index: 9999; background-color: #f0f2f5;">
+        <div style="border: 4px solid #e0e0e0; border-top: 4px solid #00a884; border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite;"></div>
+    </div>
+    <style>
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+
+    <!-- LOGIN SCREEN (Typo is fixed here) -->
     <div id="login-screen" class="screen" style="display: none;">
         <div class="login-box">
             <h2>WhatsApp Web</h2>
@@ -42,7 +50,7 @@
             </div>
         </header>
 
-        <!-- NEW: Search Bar -->
+        <!-- Search Bar -->
         <div class="search-container" style="padding: 10px 15px; background: var(--bg-color);">
             <div
                 style="display: flex; align-items: center; background: var(--input-bg); border-radius: 8px; padding: 5px 15px; border: 1px solid var(--border-color);">
@@ -86,7 +94,6 @@
                     <div class="avatar"></div>
                     <div style="display: flex; flex-direction: column;">
                         <span id="chatting-with-name" style="font-weight: bold; font-size: 16px;">User</span>
-                        <!-- NEW: Online/Typing Status -->
                         <span id="chat-user-status" style="font-size: 12px; color: #d1d7db;">Online</span>
                     </div>
                 </div>
@@ -99,10 +106,9 @@
                     style="background: none; border: none; font-size: 20px; cursor: pointer; color: white; transition: 0.3s;"
                     title="Audio Call">📞</button>
                 
-                <!-- NEW: 3 Dots Menu Container -->
+                <!-- 3 Dots Menu Container -->
                 <div style="position: relative;">
                     <button id="chat-menu-btn" style="background: none; border: none; font-size: 20px; cursor: pointer; color: white; padding: 0 5px;">⋮</button>
-                    <!-- Dropdown Box -->
                     <div id="chat-menu-dropdown" style="display: none; position: absolute; right: 0; top: 120%; background: var(--card-bg); box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-radius: 8px; z-index: 100; min-width: 120px; border: 1px solid var(--border-color);">
                         <div id="block-user-btn" style="padding: 12px 20px; color: #f44336; cursor: pointer; font-size: 14px; font-weight: bold;">Block</div>
                     </div>
@@ -117,7 +123,8 @@
         <div id="blocked-footer-msg" style="display: none; width: 100%; text-align: center; padding: 15px; background: var(--card-bg); color: var(--sub-text); font-size: 14px; border-top: 1px solid var(--border-color); cursor: pointer;">
             You blocked this contact. Tap to unblock.
         </div>
-       <!-- UPGRADED CHAT FOOTER -->
+        
+        <!-- UPGRADED CHAT FOOTER (Without Emoji) -->
         <footer id="active-chat-footer" class="chat-footer"
             style="display: flex; align-items: center; gap: 10px; padding: 10px 15px; background: var(--card-bg); border-top: 1px solid var(--border-color);">
             
@@ -139,8 +146,7 @@
     <!-- MODALS & OVERLAYS -->
     <div id="custom-confirm" class="modal-overlay" style="display: none;">
         <div class="modal-content">
-            <p style="margin-bottom: 15px; color: var(--text-color); font-weight: bold;">Delete message for everyone?
-            </p>
+            <p style="margin-bottom: 15px; color: var(--text-color); font-weight: bold;">Delete message for everyone?</p>
             <div class="modal-actions">
                 <button id="confirm-cancel" class="btn-cancel"
                     style="background: transparent; color: #00a884; border: 1px solid #00a884;">Cancel</button>
