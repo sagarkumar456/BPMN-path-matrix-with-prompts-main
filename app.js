@@ -94,6 +94,9 @@ const screens = {
     chat: document.getElementById('chat-screen')
 };
 
+// Fix for Login Screen Flash: Hide login immediately by default via JS
+if(screens.login) screens.login.style.display = 'none';
+
 let currentUser = null;
 let activeChatUser = null;
 let currentChatUnsubscribe = null; 
@@ -182,7 +185,6 @@ function loadInboxUsers() {
             if (doc.data().uid !== currentUser.uid) allUsersList.push(doc.data());
         });
         renderInboxUI();
-        // Agar baat karte waqt saamne wala block kar de, toh UI turant update hoga
         if (activeChatUser) updateBlockUI(); 
     });
 
@@ -213,7 +215,6 @@ function renderInboxUI() {
         div.className = 'chat-item';
         div.style.background = 'var(--card-bg)';
         div.style.borderBottom = '1px solid var(--border-color)';
-        // UI FIX: Flexbox lagaya taaki button hamesha right side mein fix rahe
         div.style.display = 'flex';
         div.style.alignItems = 'center';
         div.style.padding = '12px 15px';
@@ -231,10 +232,8 @@ function renderInboxUI() {
             subText = 'Tap to chat';
         } else if (status === 'pending') {
             subText = 'Request Pending';
-            // BUTTON FIX: Proper Grey Disabled Button
             buttonHTML = `<button class="btn-connect" style="background: var(--border-color); color: var(--sub-text); border: none; padding: 6px 15px; border-radius: 20px; font-weight: bold; font-size: 13px; cursor: not-allowed;" disabled>Pending</button>`;
         } else {
-            // BUTTON FIX: Proper Green Connect Button
             buttonHTML = `<button class="btn-connect action-connect" style="background: #00a884; color: white; border: none; padding: 6px 15px; border-radius: 20px; font-weight: bold; font-size: 13px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">Connect</button>`;
         }
         
@@ -250,16 +249,12 @@ function renderInboxUI() {
         if (status === 'accepted' || myBlockedUsers.includes(user.uid)) {
             div.onclick = () => openChatRoom(user); 
         } else {
-            // Screen par pe bhi click karne se request jayegi
             div.onclick = () => handleUserClick(user);
-            
             const connectBtn = div.querySelector('.action-connect');
             if (connectBtn) {
                 connectBtn.onclick = (e) => {
-                    e.stopPropagation(); // Ye double click ko rokega
+                    e.stopPropagation(); 
                     handleUserClick(user);
-                    
-                    // Button dabte hi turant "Pending" dikhane ke liye
                     connectBtn.innerText = "Pending";
                     connectBtn.style.background = "var(--border-color)";
                     connectBtn.style.color = "var(--sub-text)";
@@ -308,9 +303,6 @@ async function handleUserClick(targetUser) {
     } catch (error) { showToast("Action failed. Please try again.", "error"); }
 }
 
-// ==========================================
-// --- NEW STRICT TWO-WAY BLOCK LOGIC ---
-// ==========================================
 const chatMenuBtn = document.getElementById('chat-menu-btn');
 const chatMenuDropdown = document.getElementById('chat-menu-dropdown');
 const blockUserBtn = document.getElementById('block-user-btn');
@@ -342,7 +334,6 @@ blockUserBtn.onclick = async () => {
     } catch (error) { showToast("Error updating block status", "error"); }
 };
 
-// Check if THEY have blocked ME
 function isBlockedByThem(uid) {
     const targetUserObj = allUsersList.find(u => u.uid === uid);
     if (targetUserObj && targetUserObj.blockedUsers) {
@@ -358,11 +349,10 @@ function updateBlockUI() {
     const areTheyBlocking = isBlockedByThem(activeChatUser.uid);
     
     if (amIBlocking) {
-        // Scenario 1: Maine block kiya hai
         activeChatFooter.style.display = 'none';
         blockedFooterMsg.style.display = 'block';
         blockedFooterMsg.innerText = 'You blocked this contact. Tap to unblock.';
-        blockedFooterMsg.onclick = () => { blockUserBtn.click(); }; // Tap to unblock kaam karega
+        blockedFooterMsg.onclick = () => { blockUserBtn.click(); }; 
         blockedFooterMsg.style.cursor = 'pointer';
         
         blockUserBtn.innerText = 'Unblock User';
@@ -371,20 +361,18 @@ function updateBlockUI() {
         aCallBtn.style.opacity = '0.3'; aCallBtn.style.pointerEvents = 'none';
     } 
     else if (areTheyBlocking) {
-        // Scenario 2: Usne mujhe block kar diya hai!
         activeChatFooter.style.display = 'none';
         blockedFooterMsg.style.display = 'block';
         blockedFooterMsg.innerText = 'You cannot reply to this conversation.';
-        blockedFooterMsg.onclick = null; // Click kaam nahi karega
+        blockedFooterMsg.onclick = null; 
         blockedFooterMsg.style.cursor = 'default';
         
-        blockUserBtn.innerText = 'Block User'; // Main chahu toh main bhi block kar sakta hu
+        blockUserBtn.innerText = 'Block User'; 
         blockUserBtn.style.color = '#f44336'; 
         vCallBtn.style.opacity = '0.3'; vCallBtn.style.pointerEvents = 'none';
         aCallBtn.style.opacity = '0.3'; aCallBtn.style.pointerEvents = 'none';
     } 
     else {
-        // Scenario 3: Sab Normal hai
         activeChatFooter.style.display = 'flex';
         blockedFooterMsg.style.display = 'none';
         blockUserBtn.innerText = 'Block User';
@@ -394,15 +382,29 @@ function updateBlockUI() {
     }
 }
 
+// ==========================================
+// --- FIX: NATIVE BACK BUTTON LOGIC ---
+// ==========================================
 document.getElementById('back-btn').onclick = () => {
-    if (currentChatUnsubscribe) currentChatUnsubscribe(); 
-    activeChatUser = null;
-    showScreen('inbox');
+    // Instead of forcing the screen manually, this will simulate a natural phone back button press
+    history.back();
 };
+
+window.addEventListener('popstate', function(event) {
+    if (activeChatUser) {
+        if (currentChatUnsubscribe) currentChatUnsubscribe(); 
+        activeChatUser = null;
+        showScreen('inbox');
+    }
+});
 
 function openChatRoom(user) {
     activeChatUser = user;
     document.getElementById('chatting-with-name').innerText = user.email.split('@')[0];
+    
+    // Inject the current state into phone history to fix the blank screen bug
+    history.pushState({ page: 'chat' }, 'Chat', '#chat');
+
     showScreen('chat');
     updateBlockUI(); 
     
@@ -524,7 +526,6 @@ if (messageInputField) {
 }
 
 document.getElementById('send-btn').onclick = async () => {
-    // Security check backend hit karne se pehle
     if (myBlockedUsers.includes(activeChatUser.uid) || isBlockedByThem(activeChatUser.uid)) {
         return showToast("Cannot send message.", "error");
     }
